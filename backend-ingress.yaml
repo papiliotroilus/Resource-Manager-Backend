@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend-ingress${BRANCH_SUFFIX}
+  namespace: resource-manager
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
+spec:
+  tls:
+    - hosts:
+        - backend${BRANCH_SUFFIX}.${CI_DOMAIN}
+      secretName: backend${BRANCH_SUFFIX}-tls
+  rules:
+    - host: backend${BRANCH_SUFFIX}.${CI_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backend${BRANCH_SUFFIX}
+                port:
+                  number: 80

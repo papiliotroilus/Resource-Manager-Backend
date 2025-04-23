@@ -1,0 +1,36 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userID       String        @id @default(uuid())
+  userName     String        @unique
+  reservations Reservation[]
+  resources    Resource[]
+}
+
+model Resource {
+  resourceID   String        @id @default(uuid())
+  userID       String
+  resourceName String
+  description  String?
+  reservations Reservation[]
+  owner        User          @relation(fields: [userID], references: [userID])
+}
+
+model Reservation {
+  reservationID    String   @id @default(uuid())
+  userID           String
+  resourceID       String
+  startTime        DateTime
+  endTime          DateTime
+  reservedResource Resource @relation(fields: [resourceID], references: [resourceID])
+  reservee         User     @relation(fields: [userID], references: [userID])
+}

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend${BRANCH_SUFFIX}
+  namespace: resource-manager
+spec:
+  selector:
+    matchLabels:
+      app: backend${BRANCH_SUFFIX}
+  template:
+    metadata:
+      labels:
+        app: backend${BRANCH_SUFFIX}
+    spec:
+      containers:
+        - name: backend
+          image: ${CI_REGISTRY_PATH}/${CI_REGISTRY_PROJECT}/backend${BRANCH_SUFFIX}:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          envFrom:
+            - secretRef:
+                name: backend-env${BRANCH_SUFFIX}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend${BRANCH_SUFFIX}
+  namespace: resource-manager
+spec:
+  selector:
+    app: backend${BRANCH_SUFFIX}
+  ports:
+    - port: 80
+      targetPort: 80

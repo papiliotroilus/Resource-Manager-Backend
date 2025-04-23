@@ -1,0 +1,39 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  BRANCH_SUFFIX: "${CI_COMMIT_REF_NAME == 'main' ? '' : '-' + CI_COMMIT_REF_SLUG}"
+  IMAGE_TAG: "$CI_REGISTRY_PATH/$CI_REGISTRY_PROJECT/backend${BRANCH_SUFFIX}:latest"
+  K8S_APP_NAME: "backend${BRANCH_SUFFIX}"
+
+build:
+  stage: build
+  tags:
+    - "$CI_RUNNER_TAG"
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY_PATH\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context . --dockerfile dockerfile --destination "$IMAGE_TAG"
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "main"'
+    when: always
+  - when: manual
+
+deploy:
+  stage: deploy
+  tags:
+    - "$CI_RUNNER_TAG"
+  image: bitnami/kubectl:latest
+  script:
+    - echo "$KUBECONFIG_DATA" | base64 -d > /.kube/config
+    - envsubst < backend-deploy.yaml | kubectl apply -f -
+    - envsubst < backend-ingress.yaml | kubectl apply -f -
+    - kubectl delete pod -l app=$K8S_APP_NAME -n resource-manager || true
+    - kubectl rollout status deployment/$K8S_APP_NAME -n resource-manager
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "main"'
+    when: always
+  - when: manual
