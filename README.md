@@ -4,7 +4,7 @@ QUICK START WITH DOCKER:
 - Run the image with `docker run --name dvloper-backend --net=host --restart=unless-stopped -d -e LOGOUT_URL=http://localhost:3000/ -e PORT=3000 -e DATABASE_URL=postgresql://admin:admin@localhost:5432/resource-manager -e FRONTEND_URL=https://localhost -e KEYCLOAK_URL=http://localhost:8080/ -e KEYCLOAK_REALM=resource-manager -e KEYCLOAK_CLIENT=resource-manager-backend -e KEYCLOAK_SECRET=vAHgrkFHmwaWQsdt7KhQzdDnacv7RP6W -e KEYCLOAK_ADMIN_USERNAME=admin -e KEYCLOAK_ADMIN_PASSWORD=admin resource-manager-backend` replacing the environment variables with the appropriate info. If the realm name contains spaces, replace them with `%20`.
 
 This repository contains the backend of a resource manager.
-- It is built in TypeScript with Express.js and connects to a separate frontend housed in the `resource-manager-frontend` repository.
+- It is built in TypeScript with Express.js and connects to a separate frontend housed in the [`resource-manager-frontend`](https://github.com/papiliotroilus/Resource-Manager-Frontend) repository.
 - To properly initialise, a `.env` file needs to be created containing the app's logout redirect URL, e.g. `LOGOUT_URL=http://localhost:3000/`, and its port, e.g. `PORT=3000`, Keycloak's URL, realm, client, and client secret (`KEYCLOAK_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT`, and `KEYCLOAK_SECRET` respectively), and Keycloak admin credentials (`KEYCLOAK_ADMIN_USERNAME`, `KEYCLOAK_ADMIN_PASSWORD`)
 
 The database is designated as PostgreSQL and accessed with Prisma ORM.
@@ -36,4 +36,4 @@ A few notes on automated testing:
 - To avoid redundancy, it is recommended to run the test suite with `npm test` which only run the main suite once, otherwise it will also try to run the child suites separately
 - Coverage info is outputted to the `/coverage/` directory.
 
-Finally, this repository also contains a GitLab CI/CD manifest to incorporate this app as part of a self-updating Kubernetes cluster. For more information on this, see the `resource-manager-devops` repository.
+Finally, this repository also contains a GitLab CI/CD manifest to incorporate this app as part of a self-updating Kubernetes cluster. For more information on this, see the [`resource-manager-devops`](https://github.com/papiliotroilus/Resource-Manager-Devops) repository.
